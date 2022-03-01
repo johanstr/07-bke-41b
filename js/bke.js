@@ -1,4 +1,6 @@
 /***************************************************
+ *  MODULE 07 - JavaScript & Games
+ *  
  *  Boter-Kaas-Eieren
  *  ------------------------------------------------
  *  Versie:     2022
@@ -22,13 +24,17 @@
 =====================================================================================*/
 let play_fields = document.querySelectorAll('.game-board img');
 let game_button = document.querySelector('.game-button');
-let element_timer = document.querySelector('.timer');
+let element_timer = document.querySelector('.timer');                               // 1s, 2s
 let element_turn_image = document.querySelector('.player-info__identifier img');
 let element_turn_playernumber = document.querySelector('.player-info__number');
 let element_score_player1 = document.querySelector('#player1-score');
 let element_score_player2 = document.querySelector('#player2-score');
 let element_round = document.querySelector('.round-info__number');
 
+let round = 0;                              // Hulpvariabele
+let current_player = 0;                     // Spelernummer die aan de beurt is
+let round_time_in_seconds = 0;
+let timerID = 0;
 
 
 /*====================================================================================
@@ -65,7 +71,40 @@ window.onload = function () {
  */
 function buttonClickHandler(event)
 {
-    console.log(event);
+    if(event.target.innerHTML === 'Start ronde') {
+
+        round++;
+        element_round.innerHTML = round;
+
+        event.target.innerHTML = 'Stop ronde';
+
+        current_player = Math.floor((Math.random() * 2) + 1);
+        element_turn_playernumber.innerHTML = current_player;
+        if(current_player === 1)
+            element_turn_image.src = 'img/circle.png';
+        else
+            element_turn_image.src = 'img/cross.png';
+
+        timerID = setInterval(gameTimer, 1000);
+
+    
+        // 5. Alle cellen klikbaar maken
+    
+        // 6. Speelveld leegmaken
+
+    } else {
+        // Onderstaande alleen uitvoeren wanneer de tekst 'Stop ronde' op de knop staat
+        // 1. Speelveld leegmaken
+    
+        // 2. Timer stoppen
+        clearInterval(timerID);
+
+        // 3. Cellen onklikbaar maken
+    
+        // 4. Knoptekst veranderen in 'Start ronde'
+
+    }
+
 }
 
 
@@ -98,4 +137,8 @@ function cellClickHandler(event)
     kunnen we deze code op meerdere plaatsen in ons programma hergebruiken.
 ===================================================================================*/
 
-
+function gameTimer()
+{
+    round_time_in_seconds++;
+    element_timer.innerHTML = round_time_in_seconds + 's';
+}
