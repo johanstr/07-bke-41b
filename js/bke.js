@@ -73,9 +73,12 @@ function buttonClickHandler(event)
 {
     if(event.target.innerHTML === 'Start ronde') {
 
+        // Rondenummer ophogen met 1
         round++;
+        // Rondenummer tonen in de UI
         element_round.innerHTML = round;
 
+        // Tekst op de button aanpassen
         event.target.innerHTML = 'Stop ronde';
 
         current_player = Math.floor((Math.random() * 2) + 1);
@@ -87,22 +90,28 @@ function buttonClickHandler(event)
 
         timerID = setInterval(gameTimer, 1000);
 
-    
-        // 5. Alle cellen klikbaar maken
-    
-        // 6. Speelveld leegmaken
+        play_fields.forEach(cell => {
+            cell.addEventListener('click', cellClickHandler);
+            cell.src = 'img/empty.jpg';
+        });
 
     } else {
         // Onderstaande alleen uitvoeren wanneer de tekst 'Stop ronde' op de knop staat
         // 1. Speelveld leegmaken
-    
+        play_fields.forEach(cell => {
+            cell.src = 'img/empty.jpg';
+        });
+
         // 2. Timer stoppen
         clearInterval(timerID);
 
         // 3. Cellen onklikbaar maken
+        play_fields.forEach(cell => {
+            cell.removeEventListener('click', cellClickHandler);  
+        });
     
         // 4. Knoptekst veranderen in 'Start ronde'
-
+        event.target.innerHTML = 'Start ronde';
     }
 
 }
