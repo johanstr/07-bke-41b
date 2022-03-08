@@ -158,18 +158,25 @@ function cellClickHandler(event)
 
     // 5a. Controleren of een speler gewonnen heeft
     // console.log(event.target.src.includes('circle.png'));
-    if ((
-            play_fields[0].src.includes('circle.png') && 
-            play_fields[1].src.includes('circle.png') &&
-            play_fields[2].src.includes('circle.png')
-        ) ||
-        (
-            play_fields[3].src.includes('circle.png') && 
-            play_fields[4].src.includes('circle.png') &&
-            play_fields[5].src.includes('circle.png')
-        )) {
-            console.log('Speler 1 heeft gewonnen op rij ????');
-        }
+    if ( checkIfPlayerWon('circle.png') ) {
+            console.log('Speler 1 heeft gewonnen');
+            // 1. Score toekennen aan speler 1
+            // 2. Score tonen
+            // 3. Dialoogvenster tonen met de winnaar
+            // 4. Ronde stoppen
+    } else if ( checkIfPlayerWon('cross.png') ) {
+        console.log('Speler 2 heeft gewonnen');
+        // 1. Score toekennen aan speler 2
+        // 2. Score tonen
+        // 3. Dialoogvenster tonen met de winnaar
+        // 4. Ronde stoppen
+    } else if(checkForDraw()) {
+            console.log('Gelijk spel');
+            // 1. Score aan beide spelers toekennen
+            // 2. Score tonen
+            // 3. Dialoogvenster tonen m.b.t. gelijkspel
+            // 4. Ronde stoppen
+    }
 
     // 5b. Daarna controleren of er een gelijk spel is
 }
@@ -190,4 +197,58 @@ function gameTimer()
 {
     round_time_in_seconds++;
     element_timer.innerHTML = round_time_in_seconds + 's';
+}
+
+
+function checkWinner(index1, index2, index3, image)
+{
+    // EN = AND = &&
+    return (
+        play_fields[index1].src.includes(image) &&                // Rij 1
+        play_fields[index2].src.includes(image) &&
+        play_fields[index3].src.includes(image)
+    );
+    /*
+        Stel: 0 = cross, 1 = circle, 2 = cross
+        play_fields[0].src.includes('cross')        Ja cross zit in cel 0, dus resultaat van deze voorwaarde is true
+        play_fields[1].src.includes('cross')        resultaat is false
+        play_fields[2].src.includes('cross')        resultaat is true
+
+        true EN false EN true => false              Bij EN moeten alle onderdelen in de voorwaarde true opleveren om het geheel een true te laten opleveren
+
+        Stel: 0 = cross, 1 = circle, 2 = circle
+        play_fields[0].src.includes('cross')        true
+        play_fields[1].src.includes('cross')        false
+        play_fields[2].src.includes('cross')        false
+
+        true OF false OF false => true              Bij OF hoeft er maar eentje true te zijn om het geheel als resultaat true op te laten leveren
+    */
+}
+
+function checkIfPlayerWon(image)
+{
+    // OF = OF = ||
+    return (
+        checkWinner(0, 1, 2, image) ||
+        checkWinner(3, 4, 5, image) ||
+        checkWinner(6, 7, 8, image) ||
+        checkWinner(0, 3, 6, image) ||
+        checkWinner(1, 4, 7, image) ||
+        checkWinner(2, 5, 8, image) ||
+        checkWinner(2, 4, 6, image) ||
+        checkWinner(0, 4, 8, image)
+    );
+}
+
+function checkForDraw()
+{
+    return (!play_fields[0].src.includes('empty.jpg') &&          // Controle op gelijk spel
+        !play_fields[1].src.includes('empty.jpg') && 
+        !play_fields[2].src.includes('empty.jpg') &&
+        !play_fields[3].src.includes('empty.jpg') && 
+        !play_fields[4].src.includes('empty.jpg') &&
+        !play_fields[5].src.includes('empty.jpg') && 
+        !play_fields[6].src.includes('empty.jpg') &&
+        !play_fields[7].src.includes('empty.jpg') && 
+        !play_fields[8].src.includes('empty.jpg'));
 }
