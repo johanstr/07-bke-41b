@@ -15,10 +15,12 @@
 =====================================================================================*/
 const _PLAYER1 = 1;
 const _PLAYER2 = 2;
+
 const _PLAYER1_IMAGE = "img/circle.png";
 const _PLAYER2_IMAGE = "img/cross.png";
 const _EMPTY_IMAGE = "img/empty.jpg";
 
+const _DRAW = 0;
 
 
 /*=====================================================================================
@@ -79,21 +81,13 @@ function buttonClickHandler(event)
 {
     if(event.target.innerHTML === 'Start ronde') {
 
-        // Rondenummer ophogen met 1
-        round++;
-        // Rondenummer tonen in de UI
-        element_round.innerHTML = round;
+        nextRound();
 
         // Tekst op de button aanpassen
         event.target.innerHTML = 'Stop ronde';
 
-        current_player = Math.floor((Math.random() * 2) + 1);
-        element_turn_playernumber.innerHTML = current_player;
-        if(current_player === _PLAYER1)
-            element_turn_image.src = _PLAYER1_IMAGE;
-        else
-            element_turn_image.src = _PLAYER2_IMAGE;
-
+        determineStartingPlayer();
+        
         timerID = setInterval(gameTimer, 1000);
 
         play_fields.forEach(cell => {
@@ -111,6 +105,7 @@ function buttonClickHandler(event)
         // 2. Timer stoppen
         clearInterval(timerID);
         round_time_in_seconds = 0;
+        element_timer.innerHTML = 'Ronde tijd';
 
         // 3. Cellen onklikbaar maken
         play_fields.forEach(cell => {
@@ -148,6 +143,8 @@ function cellClickHandler(event)
     event.target.removeEventListener('click', cellClickHandler);
 
     // 3. Beurt wisselen
+    //    Hieronder zie je de uitgebreide vorm:
+    // 
     // if (current_player === 1)
     //     current_player = 2;
     // else
@@ -157,48 +154,52 @@ function cellClickHandler(event)
     current_player = (current_player === _PLAYER1 ? _PLAYER2 : _PLAYER1);
 
     // 4. Beurt tonen
-    element_turn_playernumber.innerHTML = current_player;
-    if(current_player === _PLAYER1)
-        element_turn_image.src = _PLAYER1_IMAGE;
-    else
-        element_turn_image.src = _PLAYER2_IMAGE;
+    showPlayerTurn();
 
     // 5a. Controleren of een speler gewonnen heeft
     // console.log(event.target.src.includes('circle.png'));
-    if ( checkIfPlayerWon(_PLAYER1_IMAGE) ) {
-        console.log('Speler 1 heeft gewonnen');
+    if ( checkIfPlayerWon(_PLAYER1_IMAGE) ) {                   // SPELER 1 GEWONNEN ?
         // 1. Score toekennen aan speler 1
-        score_player1 += 2;
-        // score_player1 = score_player1 + 2;
+        score_player1 += 2;                                     // Verkorte versie van: score_player1 = score_player1 + 2
+
         // 2. Score tonen
         element_score_player1.innerHTML = score_player1;
+
         // 3. Dialoogvenster tonen met de winnaar
+        dialog(_PLAYER1);
+
         // 4. Ronde stoppen
         game_button.click();
 
-    } else if ( checkIfPlayerWon(_PLAYER2_IMAGE) ) {
-        console.log('Speler 2 heeft gewonnen');
+    } else if ( checkIfPlayerWon(_PLAYER2_IMAGE) ) {            // SPELER 2 GEWONNEN ?
         // 1. Score toekennen aan speler 2
         score_player2 += 2;
+
         // 2. Score tonen
         element_score_player2.innerHTML = score_player2;
+
         // 3. Dialoogvenster tonen met de winnaar
+        dialog(_PLAYER2);
+
         // 4. Ronde stoppen
         game_button.click();
-    } else if(checkForDraw()) {
-        console.log('Gelijk spel');
+    } else if(checkForDraw()) {                                 // GELIJK SPEL ?
+        // 5b. Daarna controleren of er een gelijk spel is
         // 1. Score aan beide spelers toekennen
         score_player1 += 1;
         score_player2 += 1;
+
         // 2. Score tonen
         element_score_player1.innerHTML = score_player1;
         element_score_player2.innerHTML = score_player2;
+
         // 3. Dialoogvenster tonen m.b.t. gelijkspel
+        dialog(_DRAW);
+
         // 4. Ronde stoppen
-        game_button.click();
+        game_button.click();                                    // We simuleren hiermee een klik op de button
     }
 
-    // 5b. Daarna controleren of er een gelijk spel is
 }
 
 
@@ -271,4 +272,59 @@ function checkForDraw()
         !play_fields[6].src.includes(_EMPTY_IMAGE) &&
         !play_fields[7].src.includes(_EMPTY_IMAGE) && 
         !play_fields[8].src.includes(_EMPTY_IMAGE));
+}
+
+function dialog(state)
+{
+    // state =  1 -> speler 1 heeft gewonnen, 2 -> speler 2 heeft gewonnen, 0 -> gelijkspel
+    if(state === _DRAW) {
+        document.querySelector('.dialog > h2').innerHTML = 'Gelijkspel';
+        document.querySelector('.dialog > h3').innerHTML = '';
+        document.querySelector('.dialog > img').src = 'img/draw200x200.png';
+    } else {
+        document.querySelector('.dialog > h2').innerHTML = 'Winnaar';
+        document.querySelector('.dialog > h3').innerHTML = 'Speler ' + state;
+        // if(state === _PLAYER1)
+        //     document.querySelector('.dialog > img').src = _PLAYER1_IMAGE;
+        // else
+        //     document.querySelector('.dialog > img').src = _PLAYER2_IMAGE;
+
+        document.querySelector('.dialog > img').src = (state === _PLAYER1 ? _PLAYER1_IMAGE : _PLAYER2_IMAGE);
+    }
+
+    document.querySelector('.dialog > button').addEventListener('click', closeDialog);
+    document.querySelector('.dialog-container').classList.remove('hide');
+}
+
+function closeDialog()
+{
+    document.querySelector('.dialog > button').removeEventListener('click', closeDialog);
+    document.querySelector('.dialog-container').classList.add('hide');
+}
+
+function nextRound()
+{
+    // Rondenummer ophogen met 1
+    round++;
+    // Rondenummer tonen in de UI
+    element_round.innerHTML = round;
+}
+
+function determineStartingPlayer()
+{
+    current_player = Math.floor((Math.random() * 2) + 1);
+    element_turn_playernumber.innerHTML = current_player;
+    if(current_player === _PLAYER1)
+        element_turn_image.src = _PLAYER1_IMAGE;
+    else
+        element_turn_image.src = _PLAYER2_IMAGE;
+}
+
+function showPlayerTurn()
+{
+    element_turn_playernumber.innerHTML = current_player;
+    if(current_player === _PLAYER1)
+        element_turn_image.src = _PLAYER1_IMAGE;
+    else
+        element_turn_image.src = _PLAYER2_IMAGE;
 }
